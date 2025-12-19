@@ -1,0 +1,43 @@
+1. Calculated Monthly Revenue
+SELECT 
+    DATE_TRUNC('month', order_date) AS month_year,
+    SUM(revenue) AS monthly_revenue
+FROM sales
+GROUP BY DATE_TRUNC('month', order_date)
+ORDER BY month_year;
+
+2. Calculated month-to-month change in revenue (reveals how revenue changed over time)
+WITH monthly AS (
+    SELECT 
+        DATE_TRUNC('month', order_date) AS month_year,
+        SUM(revenue) AS monthly_revenue
+    FROM sales
+    GROUP BY DATE_TRUNC('month', order_date)
+)
+SELECT 
+    month_year,
+    monthly_revenue,
+    monthly_revenue - LAG(monthly_revenue) OVER (ORDER BY month_year) AS monthly_change
+FROM monthly;
+
+3. Calculated average quantity per SKU (reveals customer buying behavior)
+SELECT 
+    sku,
+    AVG(quantity) AS avg_quantity
+FROM sales
+GROUP BY sku
+ORDER BY avg_quantity DESC;
+
+4. Calculated total revenue by SKU (reveals top-performing SKUs)
+SELECT 
+    sku,
+    SUM(revenue) AS total_revenue
+FROM sales
+GROUP BY sku
+ORDER BY total_revenue DESC;
+
+5. Calculated multi-unit purchases (reveals revenue from SKUs brought more than once)
+SELECT 
+    SUM(revenue) AS multi_unit_revenue
+FROM sales
+WHERE quantity > 1;
